@@ -1,4 +1,4 @@
-# RAG Agent Kit - Validation Report
+# NeuroOps – RAG Platform - Validation Report
 
 **Date**: January 30, 2026
 **Repository**: rag-agent-kit
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The RAG Agent Kit has been comprehensively validated across 10 critical phases. All systems are operational, secure-by-default, and ready for deployment. The framework successfully implements a modular, headless RAG architecture with proper security controls, fail-fast behavior, and full Docker compatibility.
+NeuroOps – RAG Platform has been comprehensively validated across 10 critical phases. All systems are operational, secure-by-default, and ready for deployment. The framework successfully implements a modular, headless RAG architecture with proper security controls, fail-fast behavior, and full Docker compatibility.
 
 ---
 
@@ -426,7 +426,7 @@ curl -X POST http://localhost:8000/ask \
 
 ### ✅ SYSTEM STATUS: FULLY OPERATIONAL
 
-The RAG Agent Kit is **production-ready** with the following characteristics:
+NeuroOps – RAG Platform is **production-ready** with the following characteristics:
 
 **✅ Secure-by-default**
 - All security mechanisms active and validated
@@ -497,4 +497,4 @@ The RAG Agent Kit is **production-ready** with the following characteristics:
 
 ---
 
-**This report certifies that the RAG Agent Kit is fully validated, secure-by-default, and ready for deployment.**
+**This report certifies that NeuroOps – RAG Platform is fully validated, secure-by-default, and ready for deployment.**

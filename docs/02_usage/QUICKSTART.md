@@ -1,4 +1,4 @@
-# Quick Reference - RAG Agent Kit Local Development
+# Quick Reference - NeuroOps – RAG Platform Local Development
 
 ## 🚀 Quick Start
 

@@ -1,13 +1,13 @@
-# System Architecture – RAG Agent Kit
+# System Architecture – NeuroOps – RAG Platform
 
-This document describes the high-level architecture of the RAG Agent Kit,
+This document describes the high-level architecture of NeuroOps – RAG Platform,
 including the core request flow, optional components, and major decision points.
 
 ---
 
 ## Core Request Flow
 
-The following diagram represents the default request lifecycle for the RAG Agent Kit.
+The following diagram represents the default request lifecycle for NeuroOps – RAG Platform.
 This flow applies to all environments and does not require optional components.
 
 ![Core Request Flow](./diagrams/architecture-core-flow.png)
@@ -19,7 +19,7 @@ This flow applies to all environments and does not require optional components.
 [API Gateway / HTTP Client]
         |
         v
-[RAG Agent Kit API (FastAPI)]
+[NeuroOps – RAG Platform API (FastAPI)]
   - Auth: X-API-Key
   - Routes: /ask, /health, /docs
         |
@@ -110,7 +110,7 @@ They are enabled only when explicitly configured.
                   +---------+---------+
                             |
                             v
-[Client / App / Webhook] -> [RAG Agent Kit API] ------------------------------+
+[Client / App / Webhook] -> [NeuroOps – RAG Platform API] -------------------+
                                 |                                            |
                                 |                                            |
                                 v                                            v

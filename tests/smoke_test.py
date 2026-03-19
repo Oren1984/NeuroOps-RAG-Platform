@@ -1,8 +1,8 @@
 # tests/smoke_test.py
-# Test smoke test for RAG Agent Kit API
+# Smoke test for NeuroOps – RAG Platform API
 
 """
-Minimal smoke test for RAG Agent Kit API
+Minimal smoke test for NeuroOps – RAG Platform API
 Tests basic endpoints without requiring pytest
 """
 
@@ -66,7 +66,7 @@ def test_ask_authorized():
 def main():
     """Run all smoke tests"""
     print("=" * 60)
-    print("RAG Agent Kit - Smoke Test Suite")
+    print("NeuroOps – RAG Platform - Smoke Test Suite")
     print("=" * 60)
     
     tests = [

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "rag-agent-kit"
 version = "0.1.0"
-description = "Secure-by-default modular RAG agent kit"
+description = "NeuroOps – RAG Platform: AI-powered knowledge retrieval and context enrichment platform"
 requires-python = ">=3.10"
 dependencies = [
   "fastapi>=0.110",

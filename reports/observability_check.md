@@ -6,7 +6,7 @@
 
 ## Summary
 
-The observability infrastructure (Phoenix + OTel Collector) is successfully deployed and operational. However, the RAG Agent Kit API does not currently have OpenTelemetry instrumentation configured, so no traces are being exported yet.
+The observability infrastructure (Phoenix + OTel Collector) is successfully deployed and operational. However, the NeuroOps – RAG Platform API does not currently have OpenTelemetry instrumentation configured, so no traces are being exported yet.
 
 ## Infrastructure Status
 
@@ -53,7 +53,7 @@ observability-otel-1      otel/opentelemetry-collector   0.0.0.0:4318->4318/tcp 
 ## Current Limitations
 
 ### ⚠️ API Not Instrumented
-The RAG Agent Kit API (`src/main.py`) does not currently include OpenTelemetry instrumentation. No traces are being generated or exported.
+The NeuroOps – RAG Platform API (`src/main.py`) does not currently include OpenTelemetry instrumentation. No traces are being generated or exported.
 
 **Missing Components:**
 1. OpenTelemetry SDK dependencies not installed

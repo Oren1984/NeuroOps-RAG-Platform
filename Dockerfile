@@ -1,4 +1,4 @@
-﻿# Dockerfile for RAG Agent Kit
+﻿# Dockerfile for NeuroOps – RAG Platform
 
 # Use official Python slim image as base
 FROM python:3.11-slim

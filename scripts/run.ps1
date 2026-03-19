@@ -1,7 +1,7 @@
 ﻿# scripts/run.ps1
 # Main script to run RAG agent
 
-Write-Host "[INFO] Starting RAG Agent Kit..." -ForegroundColor Cyan
+Write-Host "[INFO] Starting NeuroOps – RAG Platform..." -ForegroundColor Cyan
 
 # Check if .env exists
 if (-not (Test-Path ".env")) {

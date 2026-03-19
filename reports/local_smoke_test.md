@@ -110,7 +110,7 @@ RATE_LIMIT_ENABLED=true
 
 ## Conclusion
 
-The RAG Agent Kit is fully operational in local Docker environment. The application:
+NeuroOps – RAG Platform is fully operational in local Docker environment. The application:
 - ✅ Builds successfully
 - ✅ Starts without errors
 - ✅ Responds to all endpoints
