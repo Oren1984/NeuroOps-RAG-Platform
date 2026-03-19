@@ -9,9 +9,10 @@ Tests basic endpoints without requiring pytest
 import sys
 import requests
 import json
+import os
 
-BASE_URL = "http://127.0.0.1:8000"
-API_KEY = "dev-test-key-12345"
+BASE_URL = os.getenv("BASE_URL", "http://127.0.0.1:8000")
+API_KEY = os.getenv("RAG_API_KEY", "ci-test-key")
 
 def test_health():
     """Test /health endpoint"""
