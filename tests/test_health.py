@@ -33,7 +33,7 @@ def test_ask_unauthorized():
 # Ask Endpoint Tests with Authorization
 def test_ask_authorized():
     """Test ask endpoint with valid API key"""
-    headers = {"X-API-Key": "dev-test-key-12345"}
+    headers = {"X-API-Key": os.getenv("RAG_API_KEY", "ci-test-key")}
     response = client.post(
         "/ask",
         json={"question": "What is RAG?"},
