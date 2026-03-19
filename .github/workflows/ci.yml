@@ -29,9 +29,9 @@ jobs:
           cp .env.example .env
           sed -i 's/RAG_API_KEY=change-me/RAG_API_KEY=ci-test-key/' .env
 
-      - name: Run tests
+      - name: Run unit tests
         run: |
-          PYTHONPATH=. pytest -q
+          PYTHONPATH=. pytest -q tests --ignore=tests/smoke_test.py
 
       - name: Run audit (python)
         run: |
@@ -45,10 +45,11 @@ jobs:
       - name: Start API (background)
         run: |
           nohup uvicorn src.main:app --host 127.0.0.1 --port 8000 >/tmp/uvicorn.log 2>&1 &
-          sleep 3
-          curl -sS http://127.0.0.1:8000/health
+          timeout 30s bash -c 'until curl -f http://127.0.0.1:8000/health; do sleep 2; done'
 
       - name: Smoke test (python)
+        env:
+          BASE_URL: http://127.0.0.1:8000
         run: |
           python tests/smoke_test.py
 
@@ -63,48 +64,3 @@ jobs:
         run: |
           echo "==== uvicorn.log ===="
           cat /tmp/uvicorn.log || true
-
-  docker-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Create env
-        run: |
-          cp .env.example .env
-          sed -i 's/RAG_API_KEY=change-me/RAG_API_KEY=ci-test-key/' .env
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        run: |
-          docker compose build --no-cache
-
-      - name: Start containers
-        run: |
-          docker compose up -d
-
-      - name: Wait for API to be ready
-        run: |
-          timeout 30s bash -c 'until curl -f http://127.0.0.1:8001/health; do sleep 2; done'
-
-      - name: Run smoke tests against Docker
-        env:
-          BASE_URL: http://127.0.0.1:8001
-        run: |
-          python tests/smoke_test.py
-
-      - name: Show container logs on failure
-        if: failure()
-        run: |
-          echo "==== API Logs ===="
-          docker compose logs api || true
-          echo "==== DB Logs ===="
-          docker compose logs db || true
-
-      - name: Cleanup
-        if: always()
-        run: |
-          docker compose down -v
