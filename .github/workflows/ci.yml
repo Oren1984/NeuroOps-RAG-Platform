@@ -31,7 +31,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest -q
+          PYTHONPATH=. pytest -q
 
       - name: Run audit (python)
         run: |
