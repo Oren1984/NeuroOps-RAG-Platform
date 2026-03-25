@@ -1,15 +1,17 @@
-# src/providers/anthropic_provider.py
-# Anthropic LLM provider for the NeuroOps Agent Platform.
+﻿# src/providers/anthropic_provider.py
+# Anthropic LLM provider implementation for the RAG Agent Kit application.
 
-from src.providers.base import LLMProvider, _post_with_retry
+import requests
+from src.providers.base import LLMProvider
 from src.core.settings import settings
 
-
+# Anthropic LLM provider class to generate
 class AnthropicProvider(LLMProvider):
     def generate(self, prompt: str) -> str:
         if not settings.anthropic_api_key:
             return f"[anthropic-stub] {prompt}"
 
+        # Call Anthropic API to get completion
         url = "https://api.anthropic.com/v1/messages"
         headers = {
             "x-api-key": settings.anthropic_api_key,
@@ -24,14 +26,12 @@ class AnthropicProvider(LLMProvider):
             "messages": [{"role": "user", "content": prompt}],
         }
 
-        r = _post_with_retry(
-            url,
-            timeout=settings.llm_timeout_seconds,
-            max_retries=settings.llm_max_retries,
-            headers=headers,
-            json=payload,
-        )
+        # Call Anthropic API to get response
+        r = requests.post(url, headers=headers, json=payload, timeout=30)
+        r.raise_for_status()
         data = r.json()
+
+        # Anthropic returns list content blocks
         parts = data.get("content", [])
         if parts and isinstance(parts, list) and "text" in parts[0]:
             return parts[0]["text"]

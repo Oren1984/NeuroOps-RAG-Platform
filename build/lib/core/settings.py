@@ -28,10 +28,6 @@ class Settings(BaseSettings):
     anthropic_api_key: str = Field(default="")
     anthropic_model: str = Field(default="claude-3-5-sonnet-latest")
 
-    # LLM provider hardening
-    llm_timeout_seconds: int = Field(default=30)   # per-attempt HTTP timeout
-    llm_max_retries: int = Field(default=2)         # retries after first attempt (3 total)
-
     # Rate limiting
     rate_limit_enabled: bool = Field(default=True)
     rate_limit_per_minute: int = Field(default=60)
@@ -45,14 +41,9 @@ class Settings(BaseSettings):
     web_search_provider: str = Field(default="serper")
     web_search_api_key: str = Field(default="")
 
-    # Ingestion pipeline
-    ingest_chunk_size: int = Field(default=1000)    # characters per chunk
-    ingest_chunk_overlap: int = Field(default=100)  # overlap between consecutive chunks
-
     # Connector
     connector: str = Field(default="rest")
     app_base_url: str = Field(default="http://localhost:5000")
-    rest_context_path: str = Field(default="/context")
     files_base_path: str = Field(default="data")
 
     # Vector store

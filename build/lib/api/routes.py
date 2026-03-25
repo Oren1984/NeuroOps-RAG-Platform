@@ -7,8 +7,6 @@ from src.core.logging import get_logger
 from src.security.auth import require_api_key
 from src.core.settings import settings
 from src.retrieval.pipeline import answer_question
-from src.ingestion.pipeline import ingest_document
-from src.ingestion.models import IngestRequest
 
 router = APIRouter()
 logger = get_logger(__name__)
@@ -43,19 +41,3 @@ def ask(payload: AskRequest, request: Request, _=Depends(require_api_key)):
     result = answer_question(payload.question)
     result["request_id"] = req_id
     return result
-
-
-# Endpoint to ingest a document into the vector store
-@router.post("/ingest", status_code=201)
-def ingest(payload: IngestRequest, request: Request, _=Depends(require_api_key)):
-    req_id = getattr(request.state, "request_id", "")
-    logger.info(
-        "ingest_request",
-        extra={
-            "request_id": req_id,
-            "source": payload.source,
-            "text_len": len(payload.text),
-        },
-    )
-    result = ingest_document(payload.text, payload.source, payload.doc_type)
-    return {**result.model_dump(exclude_none=True), "request_id": req_id}

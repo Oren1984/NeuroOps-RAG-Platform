@@ -61,6 +61,8 @@ def _get_store():
     else:
         _store = MemoryVectorStore()
 
+    # bootstrap
+    _store.upsert("boot", "This is a default knowledge snippet (boot).")
     return _store
 
 # Main pipeline function to answer a question

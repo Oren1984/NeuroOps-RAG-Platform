@@ -1,15 +1,17 @@
-# src/providers/openai_provider.py
-# OpenAI LLM provider for the NeuroOps Agent Platform.
+﻿# src/providers/openai_provider.py
+# OpenAI LLM provider implementation for the RAG Agent Kit application.
 
-from src.providers.base import LLMProvider, _post_with_retry
+import requests
+from src.providers.base import LLMProvider
 from src.core.settings import settings
 
-
+# OpenAI LLM provider class to generate
 class OpenAIProvider(LLMProvider):
     def generate(self, prompt: str) -> str:
         if not settings.openai_api_key:
             return f"[openai-stub] {prompt}"
 
+        # Call OpenAI API to get response
         url = "https://api.openai.com/v1/chat/completions"
         headers = {
             "Authorization": f"Bearer {settings.openai_api_key}",
@@ -24,12 +26,8 @@ class OpenAIProvider(LLMProvider):
             "temperature": 0.2,
         }
 
-        r = _post_with_retry(
-            url,
-            timeout=settings.llm_timeout_seconds,
-            max_retries=settings.llm_max_retries,
-            headers=headers,
-            json=payload,
-        )
+        # Call OpenAI API to get response
+        r = requests.post(url, headers=headers, json=payload, timeout=30)
+        r.raise_for_status()
         data = r.json()
         return data["choices"][0]["message"]["content"]
