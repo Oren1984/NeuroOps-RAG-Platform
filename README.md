@@ -1,4 +1,4 @@
-﻿# NeuroOps – RAG Platform
+﻿# NeuroOps – RAG Platform  - http://localhost:3001
 
 AI-powered Retrieval-Augmented Generation platform for secure knowledge retrieval, context enrichment, and intelligent agent workflows.
 
