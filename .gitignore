@@ -37,3 +37,8 @@ logs/
 # Local tooling
 # ======================
 .github/act-history.json
+
+node_modules/
+ui/node_modules/
+ui/.next/
+.env

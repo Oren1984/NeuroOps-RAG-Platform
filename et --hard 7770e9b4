@@ -1,0 +1,20 @@
+[33m313ada14[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/v2-agent-platform[m[33m)[m release(v2): clean build without node_modules
+[33m7959793f[m release: NeuroOps Agent Platform V2 - full system complete (RAG + Agents + UI + Infra)
+[33m7770e9b4[m[33m ([m[1;31morigin/feature/v2-agent-platform[m[33m)[m Update NeuroOps RAG Platform — V2 Readiness Audit Report Stage 1-4
+[33md231787a[m[33m ([m[1;33mtag: [m[1;33mv1.0.0[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m fix smoke test config for ci
+[33m5de5732f[m fix authorized test api key for ci
+[33maeaa65c1[m fix authorized test api key for ci
+[33m5d47973a[m fix ci test flow and exclude smoke tests from pytest
+[33m9dfe9b64[m fix: resolve CI import issue by setting PYTHONPATH
+[33m9373331f[m fix: CI import path for src
+[33m15b3fc04[m rebrand: NeuroOps ecosystem migration
+[33mceeb519b[m rebrand: NeuroOps ecosystem migration
+[33m4b5e0467[m rebrand: NeuroOps ecosystem migration
+[33ma335cfdf[m docs: complete architecture documentation (final)
+[33m5b773b75[m docs: finalize README, infra-only AWS note, and documentation structure
+[33m398a9f50[m docs: add verification summary and quick reference guide
+[33m96800ed9[m chore: local verification - config fixes, smoke tests, and CI improvements
+[33m59b55972[m docs: clarify automation and live intelligence capabilities
+[33m44d6619a[m chore: finalize RAG agent kit with docs, validation, and production hardening
+[33me4734bb5[m feat: initial secure-by-default headless RAG agent framework
+[33mdb300fcb[m Initial commit
