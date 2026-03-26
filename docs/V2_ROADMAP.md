@@ -1,9 +1,9 @@
 # NeuroOps Agent Platform — V2 Implementation Roadmap
 
-**Date:** 2026-03-25
-**Branch:** `feature/v2-agent-platform`
-**Source of Truth:** `reports/V2_AUDIT_REPORT.md`
-**Status:** Plan only — no code changes yet
+**Date:** 2026-03-26
+**Branch:** `main`
+**Source of Truth:** `docs/V2_AUDIT_REPORT.md`
+**Status:** Phase 1 largely complete — see completed items below
 
 ---
 
@@ -46,8 +46,8 @@ Internal package/CLI name: `neuroops` (replaces `rag-agent-kit` in `pyproject.to
 |-------|-------|--------|
 | RAG pipeline | `src/retrieval/pipeline.py` | Decompose `answer_question()` into discrete stages |
 | API routes | `src/api/routes.py` | Add new endpoints; evolve `/ask` |
-| Connectors | `src/connectors/rest_connector.py` | Implement real REST connector |
-| Web search | `src/websearch/tavily_search.py` | Implement real Tavily integration |
+| Connectors | `src/connectors/rest_connector.py` | ✅ Real REST connector implemented |
+| Web search | `src/websearch/tavily_search.py` | ✅ Real Tavily integration implemented |
 | Memory store | `src/vectorstores/memory_store.py` | Either fix or remove (broken search) |
 | Logging | `src/core/logging.py` | Implement structured logging (currently empty) |
 | Embeddings | `src/embeddings/` | Add multi-model support |
@@ -60,7 +60,7 @@ Internal package/CLI name: `neuroops` (replaces `rag-agent-kit` in `pyproject.to
 | **Memory service** | `src/memory/` | Phase 1 |
 | **Agent orchestration** | `src/agents/` | Phase 2 |
 | **Tool registry + execution** | `src/tools/` | Phase 2 |
-| **Ingestion pipeline** | `src/ingestion/` | Phase 1 |
+| **Ingestion pipeline** | `src/ingestion/` | ✅ Phase 1 — complete |
 | **Reranking** | `src/retrieval/reranker.py` | Phase 3 |
 | **Chunking strategies** | `src/ingestion/chunking.py` | Phase 1 |
 | **Streaming support** | `src/api/streaming.py` | Phase 2 |
@@ -93,11 +93,9 @@ Internal package/CLI name: `neuroops` (replaces `rag-agent-kit` in `pyproject.to
 
 Nothing in V2 is buildable without these. Phase 1 has no external dependencies.
 
-#### 1.1 Re-enable CI/CD
-- **What:** Move `.github/workflows_disabled/ci.yml` → `.github/workflows/ci.yml`
-- **Files changed:** `.github/workflows/ci.yml` (new path)
-- **Risk:** Low
-- **Outcome:** Every subsequent commit is automatically tested
+#### ✅ 1.1 Re-enable CI/CD
+- **Status:** Done — `.github/workflows/ci.yml` is active
+- **Outcome:** Every commit is automatically tested
 
 #### 1.2 Structured Logging
 - **What:** Implement `src/core/logging.py` using Python's stdlib `logging` with JSON formatter. Inject logger into all modules. Add request ID middleware.
@@ -106,15 +104,12 @@ Nothing in V2 is buildable without these. Phase 1 has no external dependencies.
 - **Risk:** Low
 - **Outcome:** Every request has a traceable `request_id`. Logs are structured JSON. Debugging becomes possible.
 
-#### 1.3 Fix / Remove Broken Components
-- **What:**
-  - Remove or clearly mark `src/vectorstores/memory_store.py` as "dev-only, no semantic search"
-  - Remove boot document from `src/retrieval/pipeline.py` (it pollutes every search result)
-  - Implement real `src/websearch/tavily_search.py` (currently returns hardcoded string)
-  - Implement real `src/connectors/rest_connector.py` (currently returns placeholder)
-- **Files changed:** `src/vectorstores/memory_store.py`, `src/retrieval/pipeline.py`, `src/websearch/tavily_search.py`, `src/connectors/rest_connector.py`
-- **Risk:** Low
-- **Outcome:** All advertised features actually work. No silent lies in the codebase.
+#### ✅ 1.3 Fix / Remove Broken Components
+- **Status:** Done
+  - `src/vectorstores/memory_store.py` marked as dev-only
+  - `src/websearch/tavily_search.py` — real Tavily API integration
+  - `src/connectors/rest_connector.py` — real HTTP GET implementation
+- **Outcome:** All advertised features work. No silent stubs.
 
 #### 1.4 Provider Hardening
 - **What:** Add HTTP timeouts to all provider calls (currently missing — a hung call blocks forever). Add basic retry with exponential backoff (1-2 retries). Add proper error types.
@@ -122,16 +117,10 @@ Nothing in V2 is buildable without these. Phase 1 has no external dependencies.
 - **Risk:** Low
 - **Outcome:** The platform doesn't hang indefinitely when an LLM API is slow.
 
-#### 1.5 Document Ingestion Pipeline
-- **What:** New `POST /ingest` endpoint. Accepts text documents (JSON body or file upload). Applies chunking → embedding → upsert to vector store. Returns ingestion summary.
-- **New files:**
-  - `src/ingestion/__init__.py`
-  - `src/ingestion/chunker.py` — fixed-size + recursive text chunking strategies
-  - `src/ingestion/pipeline.py` — ingestion orchestration
-  - `src/ingestion/models.py` — `IngestRequest`, `IngestResult` Pydantic models
-- **Files changed:** `src/api/routes.py` (add `/ingest`), `src/core/settings.py` (add chunk size config)
-- **Risk:** Medium — requires schema changes if adding metadata columns to pgvector table
-- **Outcome:** Users can load real knowledge into the platform. The RAG pipeline has actual documents to retrieve from.
+#### ✅ 1.5 Document Ingestion Pipeline
+- **Status:** Done — `POST /ingest` endpoint live
+- **Files:** `src/ingestion/chunker.py`, `src/ingestion/pipeline.py`, `src/ingestion/models.py`
+- **Outcome:** Users can load text documents into the platform via API. Fixed-size chunking + OpenAI embeddings + pgvector upsert.
 
 #### 1.6 Conversation History (Multi-Turn)
 - **What:** Add `thread_id` (optional UUID) to `/ask` request. Store message history in PostgreSQL (new `conversations` table). Inject recent turns into the LLM prompt. Return `thread_id` in every response.
@@ -708,13 +697,13 @@ curl -X POST /ask -H "X-API-Key: ..." \
 
 ## 9. Final Recommendation
 
-### Implement First (in this order)
+### Current Phase 1 Status
 
-1. **Re-enable CI/CD** — zero code change, immediate safety net for all subsequent work
-2. **Structured logging** (`src/core/logging.py` + `src/middleware/request_id.py`) — foundational for debugging everything that follows
-3. **Fix stubs** — Tavily, REST connector, memory store — eliminates silent lies in the codebase
-4. **Document ingestion** (`src/ingestion/`) — the RAG pipeline has no value without real documents
-5. **Conversation history** (`src/memory/conversation.py` + `thread_id` in `/ask`) — transforms the product
+1. ✅ **Re-enable CI/CD** — done
+2. **Structured logging** (`src/core/logging.py` + `src/middleware/request_id.py`) — still pending
+3. ✅ **Fix stubs** — Tavily and REST connector are real; memory store marked dev-only
+4. ✅ **Document ingestion** (`src/ingestion/`) — `POST /ingest` endpoint live
+5. **Conversation history** (`src/memory/conversation.py` + `thread_id` in `/ask`) — still pending
 
 ### Postpone Until Phase 2 is Stable
 
@@ -773,4 +762,4 @@ Phase 5: UI
 
 ---
 
-*This roadmap is based on `reports/V2_AUDIT_REPORT.md` and the actual repository state as of 2026-03-25. No code has been changed. Awaiting approval before implementation begins.*
+*This roadmap is based on `docs/V2_AUDIT_REPORT.md`. Phase 1 is largely complete. Remaining phases (2–5) are pending.*

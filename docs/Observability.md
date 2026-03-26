@@ -72,7 +72,5 @@ Not a full monitoring solution: this is tracing-focused tooling
 ## Where to look next
 observability/README.md – short explanation + quick commands
 
-observability/EXPECTED_OUTPUT.md – what a “healthy” trace should look like
-
 
 ---

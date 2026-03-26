@@ -5,7 +5,8 @@
       "Bash(ls:*)",
       "Bash(PYTHONPATH=. RAG_API_KEY=ci-test-key python -c \"from src.main import app; print\\('app created OK'\\)\" 2>&1)",
       "Bash(pip install:*)",
-      "Bash(PYTHONPATH=. RAG_API_KEY=ci-test-key pytest -q tests --ignore=tests/smoke_test.py 2>&1)"
+      "Bash(PYTHONPATH=. RAG_API_KEY=ci-test-key pytest -q tests --ignore=tests/smoke_test.py 2>&1)",
+      "Bash(grep -E '\\\\.\\(tsx?|jsx?|json|yml|yaml\\)$')"
     ]
   }
 }

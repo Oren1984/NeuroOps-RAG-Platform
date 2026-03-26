@@ -56,7 +56,7 @@ rag-agent-kit-db-1    Healthy   127.0.0.1:5432->5432/tcp
 
 ### ✅ 3. Health Verification
 **Status:** PASSED  
-**Report:** [reports/local_smoke_test.md](reports/local_smoke_test.md)
+**Report:** [docs/local_smoke_test.md](docs/local_smoke_test.md)
 
 **Endpoints Tested:**
 | Endpoint | Method | Auth | Status | Result |
@@ -65,6 +65,7 @@ rag-agent-kit-db-1    Healthy   127.0.0.1:5432->5432/tcp
 | `/ready` | GET | No | 200 | ✅ OK |
 | `/docs` | GET | No | 200 | ✅ OK |
 | `/ask` | POST | Yes | 200 | ✅ OK (stub mode) |
+| `/ingest` | POST | Yes | 201 | ✅ OK |
 
 **Security Validation:**
 - ✅ API key authentication enforced
@@ -75,7 +76,7 @@ rag-agent-kit-db-1    Healthy   127.0.0.1:5432->5432/tcp
 
 ### ✅ 4. Observability (Phoenix + OTel)
 **Status:** PARTIAL - Infrastructure Ready  
-**Report:** [reports/observability_check.md](reports/observability_check.md)
+**Report:** [docs/observability_check.md](docs/observability_check.md)
 
 **Infrastructure Status:**
 ```
@@ -119,7 +120,7 @@ Results: 4 passed, 0 failed
 
 ### ✅ 6. Clean Shutdown Check
 **Status:** PASSED  
-**Report:** [reports/cleanup_notes.md](reports/cleanup_notes.md)
+**Report:** [docs/cleanup_notes.md](docs/cleanup_notes.md)
 
 **Shutdown Results:**
 - ✅ All containers stopped gracefully
@@ -138,7 +139,7 @@ docker volume ls | Select-String "rag-agent-kit"         # Volume check
 
 ### ✅ 7. GitHub Actions CI
 **Status:** UPDATED  
-**File:** [.github/workflows/ci.yml](.github/workflows/ci.yml)
+**File:** `.github/workflows/ci.yml` (active)
 
 **Improvements Made:**
 1. ✅ Added `workflow_dispatch` trigger (manual runs)
@@ -173,10 +174,10 @@ docker volume ls | Select-String "rag-agent-kit"         # Volume check
 
 ### New Files Created
 - `tests/smoke_test.py` - Standalone smoke test script
-- `reports/local_smoke_test.md` - Health verification report
-- `reports/observability_check.md` - Observability stack report
+- `docs/local_smoke_test.md` - Health verification report
+- `docs/observability_check.md` - Observability stack report
 - `reports/test_output.txt` - Test execution results
-- `reports/cleanup_notes.md` - Shutdown verification report
+- `docs/cleanup_notes.md` - Shutdown verification report
 
 ### CI Workflow Updates
 - Added workflow_dispatch trigger
@@ -189,10 +190,10 @@ docker volume ls | Select-String "rag-agent-kit"         # Volume check
 
 All required deliverables created:
 
-- ✅ [reports/local_smoke_test.md](reports/local_smoke_test.md)
-- ✅ [reports/observability_check.md](reports/observability_check.md)
+- ✅ [docs/local_smoke_test.md](docs/local_smoke_test.md)
+- ✅ [docs/observability_check.md](docs/observability_check.md)
 - ✅ [reports/test_output.txt](reports/test_output.txt)
-- ✅ [reports/cleanup_notes.md](reports/cleanup_notes.md)
+- ✅ [docs/cleanup_notes.md](docs/cleanup_notes.md)
 - ✅ [.github/workflows/ci.yml](.github/workflows/ci.yml) (updated)
 
 ---

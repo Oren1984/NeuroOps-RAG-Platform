@@ -21,7 +21,7 @@ This flow applies to all environments and does not require optional components.
         v
 [NeuroOps – RAG Platform API (FastAPI)]
   - Auth: X-API-Key
-  - Routes: /ask, /health, /docs
+  - Routes: /health, /ready, /ask, /ingest
         |
         v
 [Request Orchestrator]
@@ -49,7 +49,7 @@ This flow applies to all environments and does not require optional components.
         |
         v
 [LLM Provider (choose one)]
-  - OpenAI / Gemini / Claude / Perplexity
+  - OpenAI / Gemini / Anthropic (Claude)
         |
         v
 [Response Post-Process]
@@ -77,19 +77,23 @@ This flow applies to all environments and does not require optional components.
 ## Decision Points (Pluggable Components)
 
 ### LLM Provider
-Selectable per environment or request:
-- OpenAI
-- Gemini
-- Claude
-- Perplexity (optional, web-enabled)
+Selectable via `LLM_PROVIDER` environment variable:
+- OpenAI (default: `gpt-4o-mini`)
+- Anthropic / Claude (default: `claude-3-5-sonnet-latest`)
+- Gemini (default: `gemini-1.5-flash`)
 
 ### Vector Store
-- PostgreSQL + pgvector (default)
-- Other providers can be integrated in the future
+- PostgreSQL + pgvector (production, default)
+- In-memory store (dev-only, no semantic search)
 
 ### Retrieval Mode
 - RAG (retrieve → generate)
 - Direct LLM (no retrieval)
+
+### Web Search (optional)
+- Serper (Google Search API) — set `WEB_SEARCH_PROVIDER=serper`
+- Tavily — set `WEB_SEARCH_PROVIDER=tavily`
+- Enabled via `WEB_SEARCH_ENABLED=true`
 
 ---
 
@@ -101,24 +105,14 @@ They are enabled only when explicitly configured.
 ![Optional Components](./diagrams/architecture-optional-components.png)
 
 ```
-                         (Optional)
-                  +-------------------+
-                  |  n8n Orchestrator |
-                  |  - schedule jobs  |
-                  |  - webhooks       |
-                  |  - triggers       |
-                  +---------+---------+
-                            |
-                            v
-[Client / App / Webhook] -> [NeuroOps – RAG Platform API] -------------------+
-                                |                                            |
-                                |                                            |
-                                v                                            v
-                        [Core RAG Pipeline]                           (Optional)
-                        (retrieve -> LLM)                        [Observability]
-                                |                                Phoenix + OTEL
-                                |                                   |
-                                +-------------------+---------------+
+[Client / App / HTTP Client] -> [NeuroOps – RAG Platform API] ---+
+                                        |                        |
+                                        v                        v
+                                [Core RAG Pipeline]         (Optional)
+                                (retrieve -> LLM)        [Observability]
+                                        |                Phoenix + OTEL
+                                        |                   |
+                                        +-------------------+
                                                     |
                                                     v
                                         [Traces / Spans / Debug UI]

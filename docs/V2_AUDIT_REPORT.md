@@ -1,9 +1,9 @@
 # NeuroOps RAG Platform — V2 Readiness Audit Report
 
-**Date:** 2026-03-25
-**Branch:** `feature/v2-agent-platform`
+**Date:** 2026-03-26
+**Branch:** `main`
 **Auditor:** Claude Code (Senior AI Systems Architect Review)
-**Version Audited:** v0.1.0 (V1 Baseline)
+**Version Audited:** v0.1.0
 
 ---
 
@@ -11,7 +11,7 @@
 
 The V1 baseline is a **well-structured, security-first, headless RAG API** with clean abstractions, pluggable architecture, and solid documentation. It demonstrates professional engineering intent: mandatory API key at startup, fail-fast validation, provider abstraction across three LLMs, and an optional PostgreSQL+pgvector store.
 
-However, it is **scaffolding-heavy**. Several modules that appear complete are actually stubs: the REST connector returns placeholder text, Tavily search returns a hardcoded string, the in-memory vector store has no semantic search, and OpenTelemetry is wired in config files only — never instrumented in application code.
+The in-memory vector store has no semantic search, and OpenTelemetry is wired in config files only — never instrumented in application code. REST connector, Tavily search, and document ingestion have since been implemented.
 
 For V2, this is **an excellent foundation to build upon, not a project to rewrite**. The core RAG loop works. The factory/provider patterns are already in place. The gaps are specific, addressable, and well-understood.
 
@@ -27,8 +27,8 @@ For V2, this is **an excellent foundation to build upon, not a project to rewrit
 | Language | Python 3.10+ |
 | LLM Providers | OpenAI, Anthropic, Gemini (all abstracted) |
 | Vector Stores | In-memory (naive), PostgreSQL + pgvector |
-| Web Search | Serper (real), Tavily (stub) |
-| Connectors | Files (real), REST (stub) |
+| Web Search | Serper (real), Tavily (real) |
+| Connectors | Files (real), REST (real) |
 | Auth | X-API-Key header, mandatory at startup |
 | Rate Limiting | Sliding window, in-memory, 60 req/min |
 | Observability | Phoenix + OTEL config exists, NOT instrumented |
@@ -39,7 +39,7 @@ For V2, this is **an excellent foundation to build upon, not a project to rewrit
 | Documentation | Comprehensive (architecture, security, deployment, validation) |
 
 **Total Python files:** ~27
-**Total endpoints:** 3 (`/health`, `/ready`, `/ask`)
+**Total endpoints:** 4 (`/health`, `/ready`, `/ask`, `/ingest`)
 **Total test coverage:** minimal (4 unit tests)
 
 ---
@@ -83,7 +83,7 @@ For V2, this is **an excellent foundation to build upon, not a project to rewrit
 - Terraform for AWS ECR (container registry provisioning)
 
 ### CI/CD Foundation
-- `.github/workflows_disabled/ci.yml` — complete pipeline (audit → pytest → uvicorn → smoke test → artifact)
+- `.github/workflows/ci.yml` — complete pipeline (audit → pytest → uvicorn → smoke test → artifact), active
 - `tests/smoke_test.py` — standalone HTTP verification
 
 ---
@@ -114,13 +114,12 @@ For V2, this is **an excellent foundation to build upon, not a project to rewrit
 - No external system execution (API calls, file writes, code execution)
 - No action layer of any kind
 
-### Ingestion Pipeline (0% implemented)
-- No document ingestion endpoint or CLI command
-- No chunking strategy (fixed-size, semantic, recursive, etc.)
-- No PDF / Word / Markdown parsers
-- No batch embedding pipeline
-- No metadata extraction or storage
-- The vector store can only receive pre-embedded docs via the internal boot doc
+### Ingestion Pipeline (implemented)
+- `POST /ingest` endpoint exists — accepts text documents via JSON body
+- Fixed-size chunking with overlap (`src/ingestion/chunker.py`)
+- Batch embedding via OpenAI → upsert to pgvector
+- `IngestRequest` / `IngestResult` Pydantic models in `src/ingestion/models.py`
+- Note: PDF/Word parsers and metadata extraction are not yet implemented
 
 ### Streaming Support (0% implemented)
 - No streaming responses (SSE or WebSocket)
@@ -155,14 +154,14 @@ For V2, this is **an excellent foundation to build upon, not a project to rewrit
 
 | Component | Location | State | Gap |
 |-----------|----------|-------|-----|
-| REST Connector | `src/connectors/rest_connector.py` | Stub | Returns placeholder string. No HTTP call. |
-| Tavily Search | `src/websearch/tavily_search.py` | Stub | Returns hardcoded mock string. No HTTP call. |
+| REST Connector | `src/connectors/rest_connector.py` | Real | Real HTTP GET to `APP_BASE_URL`. Returns empty string if unreachable. |
+| Tavily Search | `src/websearch/tavily_search.py` | Real | Real POST to Tavily API. Returns top-3 results. |
 | Memory Store Search | `src/vectorstores/memory_store.py` | Broken | `search()` returns first k docs regardless of query — no similarity. |
 | OpenTelemetry | `observability/otel/config.yaml` | Config only | Collector configured but nothing in app code emits spans or metrics. |
 | Phoenix Tracing | `observability/docker-compose.phoenix.yml` | Config only | Stack defined but not integrated into the RAG pipeline. |
 | Core Logging | `src/core/logging.py` | Empty | File exists but contains no code. Logging is ad-hoc per module. |
 | Terraform | `terraform/` | Partial | Provisions ECR only. No ECS, EKS, Lambda, RDS, or VPC. |
-| CI/CD | `.github/workflows_disabled/ci.yml` | Disabled | Complete workflow exists but moved to disabled folder. |
+| CI/CD | `.github/workflows/ci.yml` | Active | Pipeline moved to active workflows folder. |
 | Database Migrations | inline DDL in pgvector_store.py | Fragile | Schema is created inline at startup. No migration tooling (Alembic). |
 | Web Search — Ranking | `src/retrieval/pipeline.py` | Not implemented | Web results appended to prompt without relevance ranking. |
 | Context Enrichment | `src/retrieval/pipeline.py` | Minimal | App context + vector chunks + web snippets concatenated. No enrichment strategy (reranking, deduplication, summarization). |
@@ -224,10 +223,10 @@ The platform has **zero UI**. This is a deliberate design choice in V1 but creat
 |----------|--------|-------|
 | Embeddings | Partial | OpenAI only. No multi-model support. No batch pipeline. |
 | Retrieval | Partial | pgvector cosine search works. Memory store is broken. |
-| Chunking | Missing | No document chunking. Documents stored as raw blobs. |
+| Chunking | Implemented | Fixed-size chunking with overlap via `src/ingestion/chunker.py`. |
 | Context enrichment | Weak | Simple concatenation. No reranking, deduplication, or summarization. |
 | Provider abstraction | Strong | Clean abstract base + 3 real providers. |
-| Connectors | Partial | Files connector works. REST connector is a stub. |
+| Connectors | Working | Files connector works. REST connector makes real HTTP calls. |
 | Ranking | Missing | No BM25, no cross-encoder reranker, no MMR. |
 | Knowledge flow | Partial | Linear flow only. No feedback loop, no confidence scoring. |
 
@@ -239,7 +238,7 @@ The platform has **zero UI**. This is a deliberate design choice in V1 but creat
 
 | Sub-area | Status | Notes |
 |----------|--------|-------|
-| Web search integration | Partial | Serper (Google) is real and working. Tavily is a stub. |
+| Web search integration | Working | Serper (Google) and Tavily are both real and working. |
 | Scraping readiness | Missing | No HTML scraper, no content extractor, no headless browser. |
 | External knowledge enrichment | Weak | Web snippets appended to prompt. No quality filtering or relevance scoring. |
 | Fresh information retrieval | Partial | Works via Serper. No freshness sorting or date-aware retrieval. |
@@ -384,16 +383,16 @@ These unblock everything else.
 
 These can be done immediately without risk to existing functionality:
 
-1. **Re-enable CI/CD** — move `workflows_disabled/ci.yml` to `workflows/`. Zero code change.
+1. ✅ **Re-enable CI/CD** — done, `workflows/ci.yml` is active.
 2. **Fix `src/core/logging.py`** — implement structured logging (structlog or stdlib with JSON formatter). 1 file change.
 3. **Remove the boot document** from vector store initialization — it pollutes search results.
-4. **Add `/ingest` endpoint** — stub first, then real chunking. Unblocks knowledge loading.
+4. ✅ **`/ingest` endpoint** — implemented with real chunking and embedding.
 5. **Add `thread_id` to `/ask` request** — even if ignored at first, this establishes the API contract for multi-turn.
-6. **Implement Tavily search** — it's a stub. Real implementation is <50 lines.
+6. ✅ **Implement Tavily search** — done. Real HTTP integration in place.
 7. **Add `httpx` dependency and async client** — non-breaking, improves LLM call performance significantly.
 8. **Add request ID to responses** — inject `X-Request-ID` header. 5-10 lines of middleware.
 9. **Add timeout to all provider HTTP calls** — missing entirely. A hung LLM call hangs the response indefinitely.
-10. **Expand test coverage** — add tests for pipeline.py, each provider stub, FilesConnector. Target 80%+ coverage on core modules.
+10. **Expand test coverage** — add tests for pipeline.py, each provider, FilesConnector. Target 80%+ coverage on core modules.
 
 ---
 
@@ -479,4 +478,4 @@ The V1 code is not thrown away — it is the **kernel** around which V2 is built
 
 ---
 
-*This report is based on direct analysis of repository contents as of the V1 baseline tag on branch `feature/v2-agent-platform`. All scores, gaps, and recommendations are grounded in actual file contents, not assumptions.*
+*This report reflects the current repository state on branch `main`. Scores and gap analysis updated to reflect completed Phase 1 work (ingestion pipeline, REST connector, Tavily search, CI/CD re-enabled).*
